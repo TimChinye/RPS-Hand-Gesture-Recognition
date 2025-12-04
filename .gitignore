@@ -179,3 +179,17 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# --- Project-specific ---
+
+# Ignore all JPG and PNG files inside the 'dataset' directory and its subdirectories
+dataset/**/*.jpg
+dataset/**/*.png
+
+# Ignore large model files
+*.keras
+*.h5
+*.zip
+
+# DO NOT ignore .gitkeep files, so we can track empty directories
+!/.gitkeep
