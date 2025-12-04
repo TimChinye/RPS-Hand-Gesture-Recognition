@@ -182,9 +182,11 @@ cython_debug/
 
 # --- Project-specific ---
 
-# Ignore all JPG and PNG files inside the 'dataset' directory and its subdirectories
+# Ignore all JPG and PNG files inside the 'data'' and 'dataset' directories and its subdirectories
 dataset/**/*.jpg
 dataset/**/*.png
+data/**/*.jpg
+data/**/*.png
 
 # Ignore large model files
 *.keras
