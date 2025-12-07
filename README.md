@@ -13,7 +13,7 @@ In accordance with the assessment brief (Section 10), I have used Artificial Int
 
 I pledge that my use of AI adheres strictly to this framework. The following log provides irrefutable evidence of this process, demonstrating how each interaction was a permitted "shaping" activity and how every AI suggestion was critically "refined and reviewed" by me to meet the specific demands of the assessment brief.
 
-The unabridged chat histories are provided in the `/AI_Prompts` folder.
+The unabridged chat histories are provided in the `/AI-Prompts` folder.
 
 ## AI Prompt Log: Evidence of AITS-2 Compliance
 
