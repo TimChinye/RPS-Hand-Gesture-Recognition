@@ -15,11 +15,6 @@ def run_collection():
     Main function to run the interactive data collection process.
     This function is imported and called by the main run.py script.
     """
-    # ... (The rest of the `main()` function from your 01_data_collection.py goes here) ...
-    # IMPORTANT: Change the one line that defines DATASET_DIR inside the function
-    # It should now use the globally defined, robust path.
-    # The existing line `DATASET_DIR = os.path.join('dataset')` should be DELETED.
-    # The code will automatically use the DATASET_DIR defined at the top of this file.
 
     # --- Setup ---
     print("--- Rock-Paper-Scissors Data Collection ---")
@@ -29,10 +24,6 @@ def run_collection():
         path.mkdir(parents=True, exist_ok=True)
     
     print(f"Dataset directory structured at: {DATASET_DIR.resolve()}")
-    
-    # ... (rest of the function continues as before)
-    # The original main function from 01_data_collection.py fits here perfectly.
-    # I'll paste the whole thing for clarity.
 
     try:
         count = {cls: len(os.listdir(DATASET_DIR / cls)) for cls in CLASSES}
@@ -61,7 +52,6 @@ def run_collection():
     print(f"Starting in '{current_class}' mode. Get ready!")
 
     while True:
-        # ... (rest of the while loop code is identical to your original file)
         ret, frame = cap.read()
         if not ret:
             print("Error: Failed to capture frame from webcam. Exiting.")

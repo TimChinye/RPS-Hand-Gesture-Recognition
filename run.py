@@ -13,10 +13,11 @@ def main():
     parser.add_argument(
         "action", 
         nargs='?',
-        choices=['collect', 'prepare', 'train', 'play'],
+        choices=['collect', 'crop', 'review', 'build', 'prepare', 'train', 'play'],
         help=(
             "The main action to perform:"
             "\n  collect   - Start the interactive webcam data collection."
+            "\n  crop      - Auto-crop hands from the raw dataset."
             "\n  prepare   - Split the raw dataset into train/validation/test sets."
             "\n  train     - Train the CNN models on the prepared data."
             "\n  play      - Run the interactive game with a trained mode."
@@ -40,6 +41,19 @@ def main():
         print("--- Loading Data Collection Module ---")
         from data_collection import run_collection # type: ignore
         run_collection()
+        
+    elif args.action == 'crop':
+        print("--- Loading Cropping Module ---")
+        from utils.auto_crop import run_auto_crop # type: ignore
+        run_auto_crop()
+
+    elif args.action == 'review':
+        from utils.review import run_review # type: ignore
+        run_review()
+
+    elif args.action == 'build':
+        from utils.build_final_dataset import run_build # type: ignore
+        run_build()
         
     elif args.action == 'prepare':
         print("--- Loading Dataset Preparation Module ---")

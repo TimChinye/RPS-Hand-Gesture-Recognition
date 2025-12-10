@@ -7,7 +7,7 @@ import warnings
 # --- ROBUST PATHING & CONFIGURATION ---
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CONFIG = {
-    "source_dir": PROJECT_ROOT / "dataset",
+    "source_dir": PROJECT_ROOT / "dataset_final",
     "dest_dir": PROJECT_ROOT / "data",
     "split_ratios": {"train": 0.7, "validation": 0.15, "test": 0.15},
     "classes": ["rock", "paper", "scissors", "none"],
