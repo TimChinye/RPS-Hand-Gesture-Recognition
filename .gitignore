@@ -183,6 +183,7 @@ cython_debug/
 # --- Project-specific ---
 
 environment.yml
+.vscode
 
 # Ignore all JPG and PNG files inside the 'data'' and 'dataset' directories and its subdirectories
 data/**/*.png
