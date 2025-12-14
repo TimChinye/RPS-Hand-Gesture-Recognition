@@ -1,42 +1,45 @@
-# src/utils/auto_crop.py
 import cv2
 import mediapipe as mp
+import logging
 from pathlib import Path
-import shutil
 
-# --- CONFIGURATION ---
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%H:%M:%S'
+)
+
+logger = logging.getLogger(__name__)
+
+# Configuration
 SOURCE_DIR = Path(__file__).resolve().parent.parent.parent / "dataset"
 DEST_DIR = Path(__file__).resolve().parent.parent.parent / "dataset_cropped"
-PADDING = 20 # Pixels to add around the hand bounding box
+PADDING = 16 # Pixels to add around the hand bounding box
 
 def run_auto_crop():
-    """
-    Finds hands in the original dataset, crops them with padding,
-    and saves them to a new directory.
-    """
-    print("--- Starting Automatic Hand Cropping Pipeline ---")
+    # Finds hands in the original dataset, crops them with padding, and saves them to a new directory.
+    
+    logger.info("Starting Automatic Hand Cropping Pipeline")
     
     # Initialize MediaPipe Hands
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1, min_detection_confidence=0.5)
     
     if DEST_DIR.exists():
-        print(f"Warning: Destination directory '{DEST_DIR}' already exists. Overwriting.")
-        # Optional: uncomment to delete the directory before starting
-        # shutil.rmtree(DEST_DIR) 
+        logger.warning(f"Destination directory '{DEST_DIR}' already exists. Contents may be overwritten.")
     
     image_count = 0
     cropped_count = 0
 
     # Iterate through all class folders in the source directory
-    for class_path in SOURCE_DIR.iterdir():
-        if not class_path.is_dir():
-            continue
-            
+    class_folders = [p for p in SOURCE_DIR.iterdir() if p.is_dir()]
+    
+    for class_path in class_folders:
         dest_class_path = DEST_DIR / class_path.name
         dest_class_path.mkdir(parents=True, exist_ok=True)
         
-        print(f"\nProcessing class: {class_path.name}")
+        logger.info(f"Processing class: {class_path.name}")
         
         # Iterate through all images in the class folder
         for image_path in class_path.glob("*.png"):
@@ -44,14 +47,15 @@ def run_auto_crop():
             
             # Read the image
             image = cv2.imread(str(image_path))
+
             if image is None:
-                print(f"  - Could not read {image_path.name}, skipping.")
+                logger.warning(f"Could not read {image_path.name}, skipping.")
                 continue
 
-            # Convert the BGR image to RGB
+            # Convert the BGR image to RGB for MediaPipe
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             
-            # Process the image and find hands
+            # Process the image to find hands
             results = hands.process(image_rgb)
             
             # If a hand is detected
@@ -59,15 +63,11 @@ def run_auto_crop():
                 for hand_landmarks in results.multi_hand_landmarks:
                     # Get bounding box coordinates
                     h, w, _ = image.shape
-                    x_min, y_min = w, h
-                    x_max, y_max = 0, 0
+                    x_coords = [lm.x * w for lm in hand_landmarks.landmark]
+                    y_coords = [lm.y * h for lm in hand_landmarks.landmark]
                     
-                    for lm in hand_landmarks.landmark:
-                        x, y = int(lm.x * w), int(lm.y * h)
-                        if x < x_min: x_min = x
-                        if x > x_max: x_max = x
-                        if y < y_min: y_min = y
-                        if y > y_max: y_max = y
+                    x_min, x_max = int(min(x_coords)), int(max(x_coords))
+                    y_min, y_max = int(min(y_coords)), int(max(y_coords))
                         
                     # Apply padding
                     x_min = max(0, x_min - PADDING)
@@ -83,20 +83,21 @@ def run_auto_crop():
                         save_path = dest_class_path / image_path.name
                         cv2.imwrite(str(save_path), cropped_image)
                         cropped_count += 1
+
                     else:
-                        print(f"  - Cropping failed for {image_path.name} (zero size), skipping.")
+                        logger.warning(f"Cropping failed for {image_path.name} (zero size), skipping.")
                     
-                    # We only process the first hand found
+                    # Only process the first hand found
                     break 
             else:
-                print(f"  - No hand detected in {image_path.name}, skipping.")
+                logger.warning(f"No hand detected in {image_path.name}, skipping.")
                 
     hands.close()
-    print("\n--- Cropping Pipeline Complete ---")
-    print(f"Total images processed: {image_count}")
-    print(f"Successfully cropped and saved: {cropped_count}")
-    print(f"New dataset available at: {DEST_DIR.resolve()}")
 
+    logger.info("Cropping Pipeline Complete")
+    logger.info(f"Total images processed: {image_count}")
+    logger.info(f"Successfully cropped and saved: {cropped_count}")
+    logger.info(f"New dataset available at: {DEST_DIR.resolve()}")
 
 if __name__ == '__main__':
     run_auto_crop()

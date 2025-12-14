@@ -1,29 +1,12 @@
-"""
-Module for creating and configuring data generators for model training.
-"""
+import logging
 from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
-from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 def create_data_generators(train_dir, validation_dir, test_dir, image_size, batch_size, color_mode='rgb'):
-    """
-    Creates and configures training, validation, and test data generators.
+    # Creates and configures training, validation, and test data generators.
+    logger.info("Initializing Data Generators")
 
-    Args:
-        train_dir (Path): Path to the training data directory.
-        validation_dir (Path): Path to the validation data directory.
-        test_dir (Path): Path to the test data directory.
-        image_size (tuple): Target size for images, e.g., (150, 150).
-        batch_size (int): Number of images per batch.
-        color_mode (str): 'rgb' for 3 color channels, 'grayscale' for 1.
-
-    Returns:
-        tuple: A tuple containing (train_generator, validation_generator, test_generator).
-    """
-    print("--- Initializing Data Generators ---")
-
-    # 1. Initialize the Training ImageDataGenerator with data augmentation
-    # Data augmentation is a crucial technique to prevent overfitting by creating
-    # modified versions of the training data on-the-fly.
     train_datagen = ImageDataGenerator(
         rescale = 1 / 255,
         rotation_range = 25,
@@ -35,47 +18,41 @@ def create_data_generators(train_dir, validation_dir, test_dir, image_size, batc
         fill_mode = 'nearest'
     )
 
-    # 2. Initialize the Validation/Test ImageDataGenerator (no augmentation)
-    # We only rescale the validation and test data. We must not augment it,
-    # as we need a consistent, unbiased evaluation of the model's performance.
     val_test_datagen = ImageDataGenerator(rescale=1./255)
 
-    # 3. Create the generators using the flow_from_directory method
-    print("Creating Training Generator...")
+    # Create the generators using the flow_from_directory method
+    logger.info("Creating Training Generator...")
     train_generator = train_datagen.flow_from_directory(
         directory=train_dir,
         target_size=image_size,
         batch_size=batch_size,
         color_mode=color_mode,
-        class_mode='categorical', # For multi-class classification
-        shuffle=True,             # Shuffle training data each epoch
+        class_mode='categorical',
+        shuffle=True,
         seed=321
     )
 
-    print("Creating Validation Generator...")
+    logger.info("Creating Validation Generator...")
     validation_generator = val_test_datagen.flow_from_directory(
         directory=validation_dir,
         target_size=image_size,
         batch_size=batch_size,
         color_mode=color_mode,
         class_mode='categorical',
-        shuffle=False, # No need to shuffle validation data
+        shuffle=False,
         seed=321
     )
     
-    print("Creating Test Generator...")
+    logger.info("Creating Test Generator...")
     test_generator = val_test_datagen.flow_from_directory(
         directory=test_dir,
         target_size=image_size,
         batch_size=batch_size,
         color_mode=color_mode,
         class_mode='categorical',
-        # CRITICAL: Do NOT shuffle the test set. This ensures that predictions
-        # align with file order, which is essential for later evaluation
-        # (e.g., creating a confusion matrix).
         shuffle=False, 
         seed=321
     )
     
-    print("--- Data Generators Created Successfully ---")
+    logger.info("Data Generators Created Successfully")
     return train_generator, validation_generator, test_generator

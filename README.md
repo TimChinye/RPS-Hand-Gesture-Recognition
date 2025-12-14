@@ -1,6 +1,140 @@
 # Rock-Paper-Scissors Hand Gesture Recognition System
 
-Rest of README...
+This project implements a complete, end-to-end deep learning system for recognizing 'Rock', 'Paper', and 'Scissors' hand gestures in real-time. It's not just a classifier, but a full machine learning application, encompassing a custom data collection tool, a sophisticated data processing pipeline, model training/evaluation, and an interactive game with an intelligent AI opponent.
+
+The development followed an iterative process. Initial experiments revealed that background noise in the raw dataset was a critical bottleneck, leading to models that achieved high accuracy for the wrong reasons. To solve this, a human-in-the-loop data cropping and review pipeline was engineered using MediaPipe. This ensured the final models were trained on high-quality, focused images of hand gestures, resulting in a robust and genuinely accurate system.
+
+The final deliverable is an interactive game where the user plays against a "smart" AI opponent that uses an LSTM (Long Short-Term Memory) network to learn the player's move history and predict their next action, making for a challenging and dynamic experience.
+
+## Features
+
+-   **Interactive Data Collection:** A Python script (`src/data_collection.py`) using OpenCV to capture images directly from a webcam, with on-screen controls for switching classes and managing the capture process.
+-   **Human-in-the-Loop Data Processing Pipeline:**
+    -   **Auto-Cropping:** Uses the MediaPipe library to automatically detect and crop hands from the raw images, eliminating background noise.
+    -   **Manual Review System:** An interactive OpenCV-based tool for reviewing images where automatic cropping failed, allowing for manual cropping, rejection, or replacement.
+    -   **Dataset Assembly:** Scripts to build the final, clean dataset and split it reproducibly into training, validation, and test sets.
+-   **Dual Model Architectures:**
+    1.  **Scratch CNN:** A custom-built Convolutional Neural Network to serve as a baseline.
+    2.  **Transfer Learning:** A fine-tuned MobileNetV2 model that leverages pre-trained weights for superior performance.
+-   **Comprehensive Training & Evaluation:** A unified training script (`src/train.py`) that trains both models, saves the results, and generates performance reports, including:
+    -   Training/Validation history plots (Accuracy & Loss).
+    -   Classification reports with precision, recall, and F1-scores.
+    -   Confusion matrices for detailed error analysis.
+-   **Advanced Interactive Game:**
+    -   **Real-time Gesture Recognition:** Uses the trained model to classify the player's hand gesture live via webcam.
+    -   **Predictive AI Opponent (LSTM):** Instead of random moves, the AI uses an LSTM network to analyze the player's move history and predict their next gesture, then selects the counter-move.
+    -   **System Calibration:** An initial calibration phase to learn the "empty" scene and the "operator present" scene, preventing false positives when no gesture is being made.
+    -   **Model Explainability (Grad-CAM):** An "Analysis Mode" that visualizes the model's decision-making process using Grad-CAM heatmaps, showing which parts of the image were most influential.
+
+## Final Model Performance
+
+The final system uses the **Transfer Learning (MobileNetV2) model trained on the V2 (cropped) dataset**. This model successfully meets the project's target of >80% accuracy and demonstrates robust performance across all classes, proving it has learned the true features of the hand gestures, not background noise.
+
+| Metric            | Model #2-V2 (Transfer Learning) |
+| :---------------- | :-----------------------------: |
+| **Overall Accuracy**  | **82%**                         |
+| 'Rock' Recall     | 0.95                            |
+| 'Scissors' Recall | 0.89                            |
+| 'Paper' Recall    | 0.61                            |
+
+A detailed breakdown and comparative analysis of all model experiments can be found in `analysis.md`.
+
+## Project Structure
+
+```
+/
+├── data/                    # (Generated) Split data (train/val/test) for training.
+├── dataset/                 # (User-Generated) Raw, uncropped images from data collection.
+├── dataset_cropped/         # (Generated) Auto-cropped images from the pipeline.
+├── dataset_final/           # (Generated) Final curated dataset ready for splitting.
+├── notebooks/               # Jupyter notebooks for exploration and development.
+├── results/                 # Saved model performance metrics (reports, matrices, plots).
+├── saved_models/            # Saved final trained models (.keras files).
+├── src/                     # All Python source code for the project.
+│   ├── assets/              # UI images for the game.
+│   ├── models/              # Model architecture definitions.
+│   ├── utils/               # Helper scripts for the data processing pipeline.
+│   ├── data_collection.py   # Script to collect image data.
+│   ├── game.py              # The interactive game application.
+│   └── train.py             # Script for training and evaluating models.
+├── .gitignore               # Specifies files for Git to ignore.
+├── analysis.md              # In-depth analysis of model performance.
+├── README.md                # This file.
+└── run.py                   # Main entry point to run all project commands.
+```
+
+## Installation
+
+This project uses Conda for environment management to handle the complex dependencies of TensorFlow and OpenCV.
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/rock-paper-scissors-ai.git
+    cd rock-paper-scissors-ai
+    ```
+
+2.  **Create and activate the Conda environment:**
+    *(An `environment.yml` file should be created listing all dependencies for this step to work).*
+    ```bash
+    # It is recommended to create an environment from the provided yml file
+    # conda env create -f environment.yml
+    # conda activate rps-env
+    ```
+
+## Usage: The Full ML Pipeline
+
+The project is controlled via a single entry point, `run.py`. Run commands in the following order to go from data collection to a playable game.
+
+### Step 1: Collect Raw Image Data
+
+Open the interactive data collection tool. Use the on-screen keys to switch between classes (`r`, `p`, `s`, `n`) and press `c` to start a capture countdown. Aim for at least 100+ images per class with variations in angle and position.
+
+```bash
+python run.py collect
+```
+
+### Step 2: Process and Prepare the Dataset
+
+This multi-stage pipeline cleans the raw data and prepares it for training.
+
+1.  **Auto-Crop:** Automatically detects and crops hands from the raw `dataset/` folder, saving them to `dataset_cropped/`.
+    ```bash
+    python run.py crop
+    ```
+
+2.  **Review (Optional but Recommended):** Manually review images that could not be auto-cropped and decide to keep, discard, or manually crop them.
+    ```bash
+    python run.py review
+    ```
+
+3.  **Build Final Dataset:** Combines the successfully cropped and reviewed images into `dataset_final/`.
+    ```bash
+    python run.py build
+    ```
+
+4.  **Prepare for Training:** Splits the final dataset into `train`, `validation`, and `test` sets within the `data/` directory.
+    ```bash
+    python run.py prepare
+    ```
+
+### Step 3: Train the Models
+
+This command will train both the scratch CNN and the transfer learning model on the data prepared in the previous step. The final models will be saved in `saved_models/` and all performance reports will be saved in `results/`.
+
+```bash
+python run.py train
+```
+*(Note: The `saved_models` and `results` folders are structured by version, e.g., `v1_uncropped` and `v2_cropped`. You may need to manually move the generated files into a new versioned folder to track experiments.)*
+
+### Step 4: Play the Game!
+
+Launch the interactive game. It will automatically load the best-performing model (`saved_models/v2_cropped/transfer_model.keras`) and pit you against the smart LSTM-powered AI.
+
+```bash
+python run.py play
+```
+
+---
 
 ## AI Transparency Statement
 
@@ -22,7 +156,7 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
 ### **1. Initial Outlining & Project Structuring**
 
 > **Brief Requirement (Section 1):** To create a "**fully functional neural network system**... ensuring that your approach is both theoretically sound and practically applicable."
->
+> <br>
 > **Brief Requirement (Section 4.1):** To ensure that "**code is well-structured... for readability and reproducibility.**"
 
 *   <details>
@@ -76,7 +210,7 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
         1.  My positive classes (`rock`, `paper`, `scissors`) would be strictly limited to my bare hand to create a well-defined and solvable problem.
         2.  "Hard negative" examples, such as hands with full or fingerless gloves, would be intentionally added to the `none` class to improve the model's robustness.
     *   This informed decision was critical for applying the "concepts and principles" of building a high-quality dataset and a robust classifier, directly addressing the module's learning outcomes.
-    <!-- Personal reference: [INSERT A NEW PERSONAL REFERENCE LINK TO THIS SPECIFIC CHAT] -->
+    <!-- Personal reference: https://aistudio.google.com/app/prompts/1o38kUHxwNLqDyrGmN1Yat39jhEDyczPV -->
     </details>
 
 ---
@@ -99,7 +233,7 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
 
     *   **AITS-2 Activity:** `Prompting Thinking` / `Concept Development`
     *   **My Prompt (Implicit through error logs):** My prompt was the direct output from my terminal: `"conda install -c conda-forge opencv ... LinkError: post-link script failed ... 'C:\Users\timch\Documents\University\AI-' is not recognized as an internal or external command"`. I also provided clarifying context like `"Underscore failed in the past, that's why I changed to dashes."` and `"The issue was with the '&', I just changed it to a 'n'."`
-    *   **Outcome & Justification:** This interaction was a classic example of using AI for `prompting thinking`. The AI's initial advice was based on common best practices (e.g., using underscores). My critical feedback (`"Underscore failed..."`) forced a deeper analysis. The AI's subsequent explanation of *why* the `&` character was causing the `LinkError` was a key moment of `concept development`. **I refined and reviewed** this information, which confirmed my own diagnosis. This allowed me to confidently implement the solution (renaming the folder), which was essential for creating the required "**error free and ready to run**" code.
+    *   **Outcome & Justification:** This interaction was a classic example of using AI for `prompting thinking`. The AI's initial advice was based on common best practices (e.g; using underscores). My critical feedback (`"Underscore failed..."`) forced a deeper analysis. The AI's subsequent explanation of *why* the `&` character was causing the `LinkError` was a key moment of `concept development`. **I refined and reviewed** this information, which confirmed my own diagnosis. This allowed me to confidently implement the solution (renaming the folder), which was essential for creating the required "**error free and ready to run**" code.
     <!-- Personal reference: https://aistudio.google.com/prompts/1o38kUHxwNLqDyrGmN1Yat39jhEDyczPV -->
     </details>
 
@@ -108,8 +242,8 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
 
 ### **4. Code Generation for Boilerplate Tasks**
 
-> **Brief Requirement (Section 3.1):** To "**write suitable python code to capture several images per hand gestures category... through computer’s camera.**"
->
+> **Brief Requirement (Section 3.1):** To "**write generic python code to capture several images per hand gestures category... through computer’s camera.**"
+> <br>
 > **Brief Requirement (LO3):** To "**implement... artificial neural networks to solve real-world artificial intelligent problems.**"
 
 *   <details>
@@ -127,7 +261,7 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
 ### **5. Documentation & Compliance Refinement**
 
 > **Brief Requirement (Section 4.5):** To "**Create a readme file to contain: ... AI transparency scale declaration statement [and] AI prompts (if used).**"
->
+> <br>
 > **Brief Requirement (Section 10):** To ensure the statement and log "**clearly communicates how you have used Artificial Intelligence.**"
 
 *   <details>
@@ -143,7 +277,7 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
     </details>
 
 *   <details>
-    <summary><strong>Prompt 4.2: Auditing Log Accuracy</strong></summary>
+    <summary><strong>Prompt 5.2: Auditing Log Accuracy</strong></summary>
 
     *   **AITS-2 Activity:** `Improving Structure/Quality of the Final Output`
     *   **My Prompt:** `"From this Chatbot transcript, which of the following prompt logs, is not mentioned? [Pasted full JSON chat history of this session]"`
