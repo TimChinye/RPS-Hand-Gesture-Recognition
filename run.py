@@ -12,7 +12,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Orignally I had if/else spam & a large `help_msg`, so this map solves that.
+# Used to provide a cleaner approach than if/else spam and a large `help_msg` string.
 COMMAND_MAP = { # arg: (module_path, function_name, desc_str)
     'collect': ('data_collection',           'run_collection', 'Start the interactive webcam data collection app.'),
     'crop':    ('utils.auto_crop',           'run_auto_crop',  'Auto-crop hands from the raw dataset.'),

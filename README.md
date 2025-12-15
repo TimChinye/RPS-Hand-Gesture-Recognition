@@ -39,32 +39,25 @@ The final system uses the **Transfer Learning (MobileNetV2) model trained on the
 
 A detailed breakdown and comparative analysis of all model experiments can be found in `analysis.md`.
 
-## Project Structure
+## Option A: Running a live, interactive (Google Colab - Recommended)
 
-```
-/
-├── data/                    # (Generated) Split data (train/val/test) for training.
-├── dataset/                 # (User-Generated) Raw, uncropped images from data collection.
-├── dataset_cropped/         # (Generated) Auto-cropped images from the pipeline.
-├── dataset_final/           # (Generated) Final curated dataset ready for splitting.
-├── notebooks/               # Jupyter notebooks for exploration and development.
-├── results/                 # Saved model performance metrics (reports, matrices, plots).
-├── saved_models/            # Saved final trained models (.keras files).
-├── src/                     # All Python source code for the project.
-│   ├── assets/              # UI images for the game.
-│   ├── models/              # Model architecture definitions.
-│   ├── utils/               # Helper scripts for the data processing pipeline.
-│   ├── data_collection.py   # Script to collect image data.
-│   ├── game.py              # The interactive game application.
-│   └── train.py             # Script for training and evaluating models.
-├── .gitignore               # Specifies files for Git to ignore.
-├── analysis.md              # In-depth analysis of model performance.
-├── environment.yml          # Avoids dependency errors and allow for one-command setups.
-├── README.md                # This file.
-└── run.py                   # Main entry point to run all project commands.
-```
+### Project Links
 
-## Installation
+*   **GitHub Repository:** https://github.com/TimChinye/RPS-Hand-Gesture-Recognition
+*   **Google Colab Notebook:** https://colab.research.google.com/drive/1gwBIG6BgqVgVZ7dlufnEqwTbDG_rxGmk?usp=sharing
+*   **Dataset & Trained Models (Google Drive):** https://drive.google.com/drive/folders/1Xlbh93dTr5OEQoiqRSaBLWkjedBfQxNy?usp=sharing
+
+The Google Colab notebook is a live, interactive report that demonstrates the entire ML pipeline, from data preparation to live model evaluation.
+
+1.  Open the **Google Colab Notebook** linked above.
+2.  Click **"Runtime" -> "Run all"**.
+3.  The notebook will automatically clone the GitHub repository, download the dataset and pre-trained models from Google Drive, and run the complete evaluation, displaying all results inline.
+
+## Option B: Running the Full Project Locally
+
+This option allows you to run the entire data pipeline, train the models from scratch, and play the interactive game on your local machine.
+
+### Installation
 
 This project uses Conda to manage its environment and dependencies (TensorFlow, OpenCV, et).
 
@@ -73,7 +66,7 @@ This project uses Conda to manage its environment and dependencies (TensorFlow, 
 2.  **Clone the repository:**
     ```bash
     git clone https://github.com/TimChinye/RPS-Hand-Gesture-Recognition/.git
-    cd C://<...>/RPS-Hand-Gesture-Recognition
+    cd C://path/to/RPS-Hand-Gesture-Recognition
     ```
 
 3.  **Create and activate the Conda environment:**
@@ -82,28 +75,38 @@ This project uses Conda to manage its environment and dependencies (TensorFlow, 
     conda env create -f environment.yml
     ```
 
-    For me, I just have to run:
+    After creating with the previous command, activate it with the following command:
     ```bash
     # Before copying, replace "%USERPROFILE%" with whatever's most appropiate.
     %USERPROFILE%/miniconda3/Scripts/activate
     conda activate .\.conda
     ```
+
+### Usage: The Full ML Pipeline
+
+The entire project workflow is managed through `run.py`. Depending on your goal, you can choose one of the following paths.
+
+#### Path 1: Play Immediately (Quick Start)
+If you just want to run the game using pre-trained models, you can skip the data collection and training steps.
+
+1.  Download the "Dataset" and "Trained Models" from the [Google Drive folder](https://drive.google.com/drive/folders/1Xlbh93dTr5OEQoiqRSaBLWkjedBfQxNy?usp=sharing).
+2.  Extract `dataset_final.zip` into the project's root folder.
+3.  Create a `saved_models` folder in the root and move the two `.keras` files into it.
+4.  You can now skip to **Step 4** and run the game directly:
     ```bash
-    # They are separate commands:
-    > %USERPROFILE%/miniconda3/Scripts/activate
-    > conda activate .\.conda
-    ```
-    ```bash
-    # To be precise:
-    %USERPROFILE%\...\RPS-Hand-Gesture-Recognition>%USERPROFILE%/miniconda3/Scripts/activate
-    (base) %USERPROFILE%\<...>\RPS-Hand-Gesture-Recognition>conda activate .\.conda
+    python run.py play
     ```
 
-## Usage: The Full ML Pipeline
+#### Path 2: Train on Provided Data
+If you want to train the models yourself but skip the manual data collection, follow these steps.
 
-The entire project workflow is managed through `run.py`. Follow these steps in order to go from collecting data to playing the final game.
+1.  Download the "Dataset" from the Google Drive folder and extract it.
+2.  You can now skip to **Step 2, part 4 (`prepare`)** and then proceed with training and playing.
 
-### Step 0: Run it all at once
+#### Path 3: Run the Full Pipeline from Scratch
+To collect your own data and build everything from the ground up, follow all the detailed steps below.
+
+##### Step 0: Run it all at once
 
 To run all steps from data collection to training in sequence, execute the following commands. Each step is explained in detail in the subsequent steps.
 
@@ -118,7 +121,7 @@ python run.py play
 echo All RPS Workflow steps has been executed. 
 ```
 
-### Step 1: Collect Raw Image Data
+##### Step 1: Collect Raw Image Data
 
 Open the interactive data collection tool. Use the on-screen keys to switch between classes (`r`, `p`, `s`, `n`) and press `c` to start a capture countdown. These will be used to train, test, and validate. For the best results, use various angles, lighting settings, and positions.
 
@@ -126,7 +129,7 @@ Open the interactive data collection tool. Use the on-screen keys to switch betw
 python run.py collect
 ```
 
-### Step 2: Process and Prepare the Dataset
+##### Step 2: Process and Prepare the Dataset
 
 This multi-stage pipeline cleans the raw data and prepares it for training.
 
@@ -150,23 +153,49 @@ This multi-stage pipeline cleans the raw data and prepares it for training.
     python run.py prepare
     ```
 
-### Step 3: Train the Models
+##### Step 3: Train the Models
 
 This command will train both the scratch CNN and the transfer learning model on the data prepared in the previous step. The final models will be saved in `saved_models/` and all performance reports will be saved in `results/`.
 
 ```bash
 python run.py train
 ```
-*(Note: To compare your results with the results referenced in `analysis.md`, you can find the results in the versioned subfolders (e.g; `results/v2_cropped/`)).*
+*Note: To compare your results with the results referenced in `analysis.md`, you can find the results in the versioned subfolders (e.g; `results/v2_cropped/`).*
 
-### Step 4: Play the Game!
+##### Step 4: Play the Game!
 
 Launch the interactive game. It will automatically load the best-performing model (`saved_models/transfer_model.keras`) and pit you against the smart LSTM-powered AI.
 
-*(Note: To replicate how the game would work using the models referenced in `analysis.md`, you will want to take the files from the versioned subfolders (e.g; `saved_models/v2_cropped/`) and move them into the parent `saved_models` folder).*
+*Note: To replicate how the game would work using the models referenced in `analysis.md`, you will want to take the files from the versioned subfolders (e.g; `saved_models/v2_cropped/`) and move them into the parent `saved_models` folder.*
 
 ```bash
 python run.py play
+```
+
+### Project Structure
+
+```
+/
+├── data/                    # (Generated) Split data (train/val/test) for training.
+├── dataset/                 # (User-Generated) Raw, uncropped images from data collection.
+├── dataset_cropped/         # (Generated) Auto-cropped images from the pipeline.
+├── dataset_final/           # (Generated) Final curated dataset ready for splitting.
+├── dataset_review/          # (Generated) Collection of manually reviewed and sorted images.
+├── notebooks/               # Jupyter notebooks for exploration and development.
+├── results/                 # Saved model performance metrics (reports, matrices, plots).
+├── saved_models/            # Saved final trained models (.keras files).
+├── src/                     # All Python source code for the project.
+│   ├── assets/              # UI images for the game.
+│   ├── models/              # Model architecture definitions.
+│   ├── utils/               # Helper scripts for the data processing pipeline.
+│   ├── data_collection.py   # Script to collect image data.
+│   ├── game.py              # The interactive game application.
+│   └── train.py             # Script for training and evaluating models.
+├── .gitignore               # Specifies files for Git to ignore.
+├── analysis.md              # In-depth analysis of model performance.
+├── environment.yml          # Avoids dependency errors and one-command setups.
+├── README.md                # This file.
+└── run.py                   # Main entry point to run all project commands.
 ```
 
 ---
@@ -272,7 +301,6 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
     <!-- Personal reference: https://aistudio.google.com/prompts/1o38kUHxwNLqDyrGmN1Yat39jhEDyczPV -->
     </details>
 
-
 ---
 
 ### **4. Code Generation for Boilerplate Tasks**
@@ -285,10 +313,21 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
     <summary><strong>Prompt 4.1: Generating the Data Collection Script</strong></summary>
 
     *   **AITS-2 Activity:** `Improving Structure/Quality of the Final Output`
-    *   **My Prompt:** `"Write a Python script using OpenCV to capture images from your webcam. The script should save images to structured folders (/dataset/rock, /dataset/paper, etc.). Here's my existing project structure: [pasted project tree structure]"`
-    *   **Outcome & Justification:** In line with AITS-2, I used AI to generate a boilerplate script for a standard, repetitive task. This improved the quality and speed of my initial setup. After generating three versions, **I refined and reviewed** them extensively, combined specific ideas and refactored it to make it m own.
+    *   **My Prompt:** `"Write a Python script using OpenCV to capture images from your webcam. The script should save images to structured folders (/dataset/rock, /dataset/paper, etc). Here's my existing project structure: [pasted project tree structure]"`
+    *   **Outcome & Justification:** In line with AITS-2, I used AI to generate a boilerplate script for a standard, repetitive task. This improved the quality and speed of my initial setup. After generating three versions, **I refined and reviewed** them extensively, combined specific ideas and refactored it to make it my own.
     *   The AI's role was limited to shaping the initial tool; the core intellectual work of creating the dataset, a key part of solving this "real-world problem," was entirely my own.
     <!-- Personal reference: https://aistudio.google.com/prompts/1o38kUHxwNLqDyrGmN1Yat39jhEDyczPV -->
+    </details>
+
+*   <details>
+    <summary><strong>Prompt 4.2: Refining the Final Submission Notebook</strong></summary>
+
+    *   **AITS-2 Activity:** `Improving Structure/Quality of the Final Output`
+    *   **My Prompt:** The conversation began with a strategic question: `"Based on the point I'm at now, what do I do to match that gold standard?"` I then provided my existing work (code, assets, draft notebooks) and asked the AI to help assemble the final, polished Google Colab notebook. This was followed by my own critical feedback, such as:
+        *   Identifying a runtime bug: `"TypeError: run_split() got an unexpected keyword argument 'source_dir'"`
+        *   Demanding better quality explanations: `"...there's no actual explanations going on. Like why did we choose 'that' batch size..."`
+    *   **Outcome & Justification:** This interaction perfectly demonstrates the AITS-2 framework. The AI's role was for **improving structure/quality of the final output** by refactoring my existing, human-written code into the professional, reproducible notebook format we had discussed. The core intellectual work—the code, the models, the dataset—was entirely my own. Crucially, **I refined and reviewed** the AI's output, acting as the human developer directing the process. I identified a functional bug and demanded a higher standard of documentation, which the AI then incorporated. The final deliverable was a direct result of this iterative, human-led refinement process.
+    <!-- Personal reference: https://aistudio.google.com/prompts/1xWWrQPfeS8RMf9McuWl5WLhVXYhvS0vy -->
     </details>
     
     ---
@@ -307,7 +346,7 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
         *   `"Nope doesn't work, too subjective. Quote the assignment so it's irrefutable."`
         *   `"The justification cannot be 'the brief said to do X, so I used AI to do X.' It should be 'The brief said I can use AI to do X.'"`
         *   `"It needs to be very clear... and use the two quotes from the AITS table in the brief."`
-    *   **Outcome & Justification:** This interaction is a direct, provable example of the AITS-2 framework in action. The AI's role was to provide initial structures and drafts for this documentation. My role was to provide the critical direction to ensure the final output was not just a list, but a logically sound, evidence-based argument for compliance. **I refined and reviewed** every AI suggestion, rejecting flawed logic and demanding a higher standard of proof, which ultimately produced the clear and irrefutable log you are now reading. The full history of this meta-conversation is included in the `/AI_Prompts` folder as definitive evidence of this critical review process.
+    *   **Outcome & Justification:** This interaction is a direct, provable example of the AITS-2 framework in action. The AI's role was to provide initial structures and drafts for this documentation. My role was to provide the critical direction to ensure the final output was not just a list, but a logically sound, evidence-based argument for compliance. **I refined and reviewed** every AI suggestion, rejecting flawed logic and demanding a higher standard of proof, which ultimately produced the clear and irrefutable log you are now reading. The full history of this meta-conversation is included in the `/AI-Prompts` folder as definitive evidence of this critical review process.
     <!-- Personal reference: https://aistudio.google.com/prompts/12BVdQD4ovVUd29QRjXosqcczrFUIyOIY -->
     </details>
 
@@ -318,4 +357,17 @@ The unabridged chat histories are provided in the `/AI-Prompts` folder.
     *   **My Prompt:** `"From this Chatbot transcript, which of the following prompt logs, is not mentioned? [Pasted full JSON chat history of this session]"`
     *   **Outcome & Justification:** I used the AI to cross-reference my drafted `README.md` against the actual chat history file to ensure 100% factual accuracy. The AI identified that the examples in Categories 2 and 3 (regarding `Conda` and `ImageDataGenerator`) were illustrative templates generated by the AI in previous turns, rather than actual prompts from this specific conversation thread. **I refined and reviewed** the final log based on this audit, ensuring that the submitted log only contains entries that are backed by the evidence in the provided transcript files.
     <!-- Personal reference: https://aistudio.google.com/prompts/1nXJa-g6ag-qopEYadFCOrfBP2n7WAuFF -->
+    </details>
+
+*   <details>
+    <summary><strong>Prompt 5.3: Pre-Submission Review and Refinement</strong></summary>
+
+    *   **AITS-2 Activity:** `Improving Structure/Quality of the Final Output` / `Prompting Thinking`
+    *   **My Prompt (Iterative Conversation):** After completing the codebase, I initiated a final review with prompts like: `"Look at the codebase and compare it to the assignment brief, then let me know what I'm missing."` This was followed by a series of specific, human-led refinement requests, including: `"But like... I can't actually see any results, perhaps we should 'display' rather than export it."`, `"Why not use a re-usable function...?"`
+    *   **Outcome & Justification:** This interaction perfectly demonstrates the AITS-2 framework. The AI was used as a quality assurance partner to **improve the final output**. Its role was to generate templates (the `.ipynb` notebook), provide suggestions, and audit the code for minor issues. **I reviewed and refined** every single AI output. For instance:
+        1. I corrected the AI's initial assumption about missing files.
+        2. I identified a functional flaw in the AI-generated notebook (no visible results) and directed the fix.
+        3. I proposed a superior coding practice (a reusable function) which the AI then helped implement, proving that the **human contribution was not just to review, but to actively improve upon the AI's suggestions**.
+    *   The AI's contribution was clearly limited to "shaping" and "improving quality" under my direct supervision, with all critical thinking, problem identification, and final decisions being made by me.
+    <!-- Personal reference: https://aistudio.google.com/prompts/1zsZoyABJK0AQ1e66dYfzbFP7micLahmw -->
     </details>
