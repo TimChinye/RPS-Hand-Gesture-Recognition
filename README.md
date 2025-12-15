@@ -59,35 +59,68 @@ A detailed breakdown and comparative analysis of all model experiments can be fo
 │   └── train.py             # Script for training and evaluating models.
 ├── .gitignore               # Specifies files for Git to ignore.
 ├── analysis.md              # In-depth analysis of model performance.
+├── environment.yml          # Avoids dependency errors and allow for one-command setups.
 ├── README.md                # This file.
 └── run.py                   # Main entry point to run all project commands.
 ```
 
 ## Installation
 
-This project uses Conda for environment management to handle the complex dependencies of TensorFlow and OpenCV.
+This project uses Conda to manage its environment and dependencies (TensorFlow, OpenCV, et).
 
-1.  **Clone the repository:**
+1.  **Prerequisites:** Make sure you have [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution) installed.
+
+2.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/rock-paper-scissors-ai.git
-    cd rock-paper-scissors-ai
+    git clone https://github.com/TimChinye/RPS-Hand-Gesture-Recognition/.git
+    cd C://<...>/RPS-Hand-Gesture-Recognition
     ```
 
-2.  **Create and activate the Conda environment:**
-    *(An `environment.yml` file should be created listing all dependencies for this step to work).*
+3.  **Create and activate the Conda environment:**
     ```bash
     # It is recommended to create an environment from the provided yml file
-    # conda env create -f environment.yml
-    # conda activate rps-env
+    conda env create -f environment.yml
+    ```
+
+    For me, I just have to run:
+    ```bash
+    # Before copying, replace "%USERPROFILE%" with whatever's most appropiate.
+    %USERPROFILE%/miniconda3/Scripts/activate
+    conda activate .\.conda
+    ```
+    ```bash
+    # They are separate commands:
+    > %USERPROFILE%/miniconda3/Scripts/activate
+    > conda activate .\.conda
+    ```
+    ```bash
+    # To be precise:
+    %USERPROFILE%\...\RPS-Hand-Gesture-Recognition>%USERPROFILE%/miniconda3/Scripts/activate
+    (base) %USERPROFILE%\<...>\RPS-Hand-Gesture-Recognition>conda activate .\.conda
     ```
 
 ## Usage: The Full ML Pipeline
 
-The project is controlled via a single entry point, `run.py`. Run commands in the following order to go from data collection to a playable game.
+The entire project workflow is managed through `run.py`. Follow these steps in order to go from collecting data to playing the final game.
+
+### Step 0: Run it all at once
+
+To run all steps from data collection to training in sequence, execute the following commands. Each step is explained in detail in the subsequent steps.
+
+```bash
+python run.py collect
+python run.py crop
+python run.py review
+python run.py build
+python run.py prepare
+python run.py train
+python run.py play
+echo All RPS Workflow steps has been executed. 
+```
 
 ### Step 1: Collect Raw Image Data
 
-Open the interactive data collection tool. Use the on-screen keys to switch between classes (`r`, `p`, `s`, `n`) and press `c` to start a capture countdown. Aim for at least 100+ images per class with variations in angle and position.
+Open the interactive data collection tool. Use the on-screen keys to switch between classes (`r`, `p`, `s`, `n`) and press `c` to start a capture countdown. These will be used to train, test, and validate. For the best results, use various angles, lighting settings, and positions.
 
 ```bash
 python run.py collect
@@ -124,11 +157,13 @@ This command will train both the scratch CNN and the transfer learning model on 
 ```bash
 python run.py train
 ```
-*(Note: The `saved_models` and `results` folders are structured by version, e.g., `v1_uncropped` and `v2_cropped`. You may need to manually move the generated files into a new versioned folder to track experiments.)*
+*(Note: To compare your results with the results referenced in `analysis.md`, you can find the results in the versioned subfolders (e.g; `results/v2_cropped/`)).*
 
 ### Step 4: Play the Game!
 
-Launch the interactive game. It will automatically load the best-performing model (`saved_models/v2_cropped/transfer_model.keras`) and pit you against the smart LSTM-powered AI.
+Launch the interactive game. It will automatically load the best-performing model (`saved_models/transfer_model.keras`) and pit you against the smart LSTM-powered AI.
+
+*(Note: To replicate how the game would work using the models referenced in `analysis.md`, you will want to take the files from the versioned subfolders (e.g; `saved_models/v2_cropped/`) and move them into the parent `saved_models` folder).*
 
 ```bash
 python run.py play

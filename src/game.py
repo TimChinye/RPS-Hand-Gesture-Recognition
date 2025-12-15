@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MODEL_FILENAME = "transfer_model.keras"
 ASSETS_DIRNAME = "assets"
-MODEL_PATH = PROJECT_ROOT / "saved_models/v2_cropped" / MODEL_FILENAME
+MODEL_PATH = PROJECT_ROOT / "saved_models" / MODEL_FILENAME
 ASSETS_PATH = Path(__file__).resolve().parent / ASSETS_DIRNAME
 
 # Model & Image Settings

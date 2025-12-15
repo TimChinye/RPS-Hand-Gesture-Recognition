@@ -182,14 +182,14 @@ cython_debug/
 
 # --- Project-specific ---
 
-environment.yml
+.conda
 .vscode
 
 # Ignore all JPG and PNG files inside the 'data'' and 'dataset' directories and its subdirectories
 data/**/*.png
 data/**/*.jpg
-dataset/**/*.jpg
 dataset/**/*.png
+dataset/**/*.jpg
 dataset_cropped/**/*.jpg
 dataset_cropped/**/*.png
 dataset_final/**/*.jpg
@@ -199,10 +199,10 @@ dataset_manual_review/**/*.png
 dataset_review/**/*.jpg
 dataset_review/**/*.png
 
+# DO NOT ignore .gitkeep files, so we can track empty directories
+!/.gitkeep
+
 # Ignore large model files
 *.keras
 *.h5
 *.zip
-
-# DO NOT ignore .gitkeep files, so we can track empty directories
-!/.gitkeep
